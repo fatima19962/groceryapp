@@ -9,6 +9,7 @@ import 'package:groceryapp/widgets/price_widget.dart';
 import 'package:groceryapp/widgets/text_widget.dart';
 import 'package:groceryapp/models/products_model.dart';
 import 'package:provider/provider.dart';
+import '../provider/cart_provider.dart';
 import 'heart_btn.dart';
 
 class FeedsWidget extends StatefulWidget {
@@ -178,6 +179,13 @@ class _FeedsWidgetState extends State<FeedsWidget> {
   Widget build(BuildContext context) {
     Size size = Utils(context).getScreenSize;
     final Color color = Utils(context).color;
+    final productModel = Provider.of<ProductModel>(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+    bool? _isInCart = cartProvider.getCartItems.containsKey(productModel.id);
+    final wishlistProvider = Provider.of<WishlistProvider>(context);
+    bool? _isInWishlist =
+        wishlistProvider.getWishlistItems.containsKey(productModel.id);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Material(
@@ -186,8 +194,10 @@ class _FeedsWidgetState extends State<FeedsWidget> {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            GlobalMethods.navigateTo(
-                ctx: context, routeName: ProductDetails.routeName);
+            // GlobalMethods.navigateTo(
+            //     ctx: context, routeName: ProductDetails.routeName);
+            Navigator.pushNamed(context, ProductDetails.routeName,
+                arguments: productModel.id);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,7 +207,7 @@ class _FeedsWidgetState extends State<FeedsWidget> {
               Flexible(
                 flex: 3,
                 child: FancyShimmerImage(
-                  imageUrl: 'https://i.ibb.co/F0s3FHQ/Apricots.png',
+                  imageUrl: productModel.imageUrl,
                   height: size.width * 0.21,
                   width: size.width * 0.2,
                   boxFit: BoxFit.fill,
@@ -209,13 +219,19 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                   Flexible(
                     flex: 3,
                     child: TextWidget(
-                        text: "Title",
+                        text: productModel.title,
                         color: color,
                         textSize: 18,
                         maxLines: 1,
                         isTitle: true),
                   ),
-                  Flexible(flex: 1, child: HeartBTN()),
+                  Flexible(
+                    flex: 1,
+                    child: HeartBTN(
+                      productId: productModel.id,
+                      isInWishlist: _isInWishlist,
+                    ),
+                  ),
                 ],
               ),
               Row(
@@ -224,10 +240,11 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                   Flexible(
                     flex: 3,
                     child: PriceWidget(
-                      price: 5.9,
-                      salePrice: 2.99,
+                      salePrice: productModel.salePrice,
+                      price: productModel.price,
                       textPrice: _quantityTextController.text,
-                      isOnSale: true,
+                      isOnSale: productModel.isOnSale,
+                      // isOnSale: true,
                     ),
                   ),
                   // const SizedBox(
@@ -243,7 +260,7 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                           flex: 5,
                           child: FittedBox(
                             child: TextWidget(
-                                text: 'KG',
+                                text: productModel.isPiece ? 'Piece' : 'kg',
                                 color: color,
                                 textSize: 18,
                                 isTitle: true),
@@ -288,7 +305,41 @@ class _FeedsWidgetState extends State<FeedsWidget> {
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: _isInCart
+                      ? null
+                      : () {
+                          // if (_isInCart) {
+                          //   return;
+                          // }
+                          cartProvider.addProductsToCart(
+                              productId: productModel.id,
+                              quantity:
+                                  int.parse(_quantityTextController.text));
+                        },
+
+                  // onPressed: _isInCart
+                  // ? null
+                  //     : () async {
+                  // if (_isInCart) {
+                  //   return;
+                  // }
+                  // final User? user = authInstance.currentUser;
+                  //
+                  // if (user == null) {
+                  // GlobalMethods.errorDialog(
+                  // subtitle: 'No user found, Please login first',
+                  // context: context);
+                  // return;
+                  // }
+                  // await GlobalMethods.addToCart(
+                  // productId: productModel.id,
+                  // quantity: int.parse(_quantityTextController.text),
+                  // context: context);
+                  // await cartProvider.fetchCart();
+                  // cartProvider.addProductsToCart(
+                  //     productId: productModel.id,
+                  //     quantity: int.parse(_quantityTextController.text));
+
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
                           Theme.of(context).cardColor),
@@ -300,7 +351,8 @@ class _FeedsWidgetState extends State<FeedsWidget> {
                             bottomRight: Radius.circular(12)),
                       ))),
                   child: TextWidget(
-                    text: 'Add to cart',
+                    // text: 'Add to cart',
+                    text: _isInCart ? 'In cart' : 'Add to cart',
                     maxLines: 1,
                     color: color,
                     textSize: 20,

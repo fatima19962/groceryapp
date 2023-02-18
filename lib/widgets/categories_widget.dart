@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:groceryapp/inner_sceens/cat_screen.dart';
 import 'package:groceryapp/provider/dark_theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:groceryapp/widgets/text_widget.dart';
@@ -22,7 +23,9 @@ class CategoriesWidget extends StatelessWidget {
     final Color color = themeState.getDarkTheme ? Colors.white : Colors.black;
     return InkWell(
       onTap: () {
-        print('Category pressed');
+        // print('Category pressed');
+        Navigator.pushNamed(context, CategoryScreen.routeName,
+            arguments: catText);
       },
       child: Container(
         // height: _screenWidth * 0.3, we use gridview

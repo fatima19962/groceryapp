@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:groceryapp/provider/dark_theme_provider.dart';
+import 'package:groceryapp/provider/viewed_prod_provider.dart';
+import 'package:groceryapp/screens/viewed_recently/viewed_recently.dart';
 import 'package:groceryapp/services/global_methods.dart';
 import 'package:groceryapp/widgets/text_widget.dart';
 import 'package:groceryapp/wishlist/wishlist_screen.dart';
@@ -105,7 +107,11 @@ class _UserScreenState extends State<UserScreen> {
               _listTiles(
                   title: 'Viewed',
                   icon: IconlyBold.show,
-                  onPressed: () {},
+                  onPressed: () {
+                    GlobalMethods.navigateTo(
+                        ctx: context,
+                        routeName: ViewedRecentlyScreen.routeName);
+                  },
                   color: color),
               _listTiles(
                   title: 'Forget Password',
@@ -133,7 +139,12 @@ class _UserScreenState extends State<UserScreen> {
                 title: 'LogOut',
                 icon: IconlyBold.logout,
                 onPressed: () {
-                  _showLogoutDialog();
+                  // _showLogoutDialog();
+                  GlobalMethods.warningDialog(
+                      title: 'Sign Out',
+                      subtitle: 'Do you wanna sign out?',
+                      fct: () {},
+                      context: context);
                 },
                 color: color,
               ),
@@ -157,51 +168,51 @@ class _UserScreenState extends State<UserScreen> {
     ));
   }
 
-  Future<void> _showLogoutDialog() async {
-    await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Image.asset(
-                  "assets/images/warning-sign.png",
-                  height: 20,
-                  width: 20,
-                  fit: BoxFit.fill,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                const Text("Sign out"),
-              ],
-            ),
-            content: const Text("Do you wanna sign out?"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  if (Navigator.canPop(context)) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: TextWidget(
-                  color: Colors.cyan,
-                  text: "Cancel",
-                  textSize: 18,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: TextWidget(
-                  color: Colors.red,
-                  text: "Ok",
-                  textSize: 18,
-                ),
-              ),
-            ],
-          );
-        });
-  }
+  // Future<void> _showLogoutDialog() async {
+  //   await showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Row(
+  //             children: [
+  //               Image.asset(
+  //                 "assets/images/warning-sign.png",
+  //                 height: 20,
+  //                 width: 20,
+  //                 fit: BoxFit.fill,
+  //               ),
+  //               const SizedBox(
+  //                 width: 8,
+  //               ),
+  //               const Text("Sign out"),
+  //             ],
+  //           ),
+  //           content: const Text("Do you wanna sign out?"),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () {
+  //                 if (Navigator.canPop(context)) {
+  //                   Navigator.pop(context);
+  //                 }
+  //               },
+  //               child: TextWidget(
+  //                 color: Colors.cyan,
+  //                 text: "Cancel",
+  //                 textSize: 18,
+  //               ),
+  //             ),
+  //             TextButton(
+  //               onPressed: () {},
+  //               child: TextWidget(
+  //                 color: Colors.red,
+  //                 text: "Ok",
+  //                 textSize: 18,
+  //               ),
+  //             ),
+  //           ],
+  //         );
+  //       });
+  // }
 
   Future<void> _showAddressDialog() async {
     await showDialog(

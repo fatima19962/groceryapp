@@ -23,22 +23,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> _offerImages = [
-    'assets/images/offers/Offer1.jpg',
-    'assets/images/offers/Offer2.jpg',
-    'assets/images/offers/Offer3.jpg',
-    'assets/images/offers/Offer4.jpg'
-  ];
+  // final List<String> _offerImages = [
+  //   'assets/images/offers/Offer1.jpg',
+  //   'assets/images/offers/Offer2.jpg',
+  //   'assets/images/offers/Offer3.jpg',
+  //   'assets/images/offers/Offer4.jpg'
+  // ];
 
   @override
   Widget build(BuildContext context) {
     // final themeState = Provider.of<DarkThemeProvider>(context);
     final Color color = Utils(context).color;
     final Utils utils = Utils(context);
-    final themeState = utils.getTheme;
+    // final themeState = utils.getTheme;
     Size size = Utils(context).getScreenSize;
     // GlobalMethods globalMethods = GlobalMethods();
-
+    final productProviders = Provider.of<ProductsProvider>(context);
+    List<ProductModel> allProducts = productProviders.getProducts;
+    List<ProductModel> productsOnSale = productProviders.getOnSaleProducts;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -64,12 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   //   fit: BoxFit.fill,
                   // );
                   return Image.asset(
-                    _offerImages[index],
+                    Constss.offerImages[index],
+                    // _offerImages[index],
                     fit: BoxFit.fill,
                   );
                 },
                 autoplay: true,
-                itemCount: _offerImages.length,
+                itemCount: Constss.offerImages.length,
                 pagination: const SwiperPagination(
                     alignment: Alignment.bottomCenter,
                     builder: DotSwiperPaginationBuilder(
@@ -125,10 +128,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SizedBox(
                   height: size.height * 0.24,
                   child: ListView.builder(
-                      itemCount: 10,
+                      itemCount: productsOnSale.length < 10
+                          ? productsOnSale.length
+                          : 10,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (ctx, index) {
-                        return const OnSaleWidget();
+                        return ChangeNotifierProvider.value(
+                            value: productsOnSale[index],
+                            child: const OnSaleWidget());
                       }),
                 ),
               ),
@@ -177,17 +184,17 @@ class _HomeScreenState extends State<HomeScreen> {
             //   children: List.generate(4, (index) {
             //     return FeedsWidget();
             //   }),
-            GridView.count(
-              crossAxisSpacing: 10,
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-              children: List.generate(4, (index) {
-                return FeedsWidget();
-              }),
-            )
+            // GridView.count(
+            //   crossAxisSpacing: 10,
+            //   shrinkWrap: true,
+            //   padding: EdgeInsets.zero,
+            //   physics: const NeverScrollableScrollPhysics(),
+            //   crossAxisCount: 2,
+            //   childAspectRatio: 1,
+            //   children: List.generate(4, (index) {
+            //     return FeedsWidget();
+            //   }),
+            // )
             // GridView.builder(
             //   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             //     maxCrossAxisExtent: 10,
@@ -200,6 +207,23 @@ class _HomeScreenState extends State<HomeScreen> {
             //     return FeedsWidget();
             //   },
             // ),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              padding: EdgeInsets.zero,
+              // crossAxisSpacing: 10,
+              childAspectRatio: 1,
+              children: List.generate(
+                  allProducts.length < 4
+                      ? allProducts.length // length 3
+                      : 4, (index) {
+                return ChangeNotifierProvider.value(
+                  value: allProducts[index],
+                  child: const FeedsWidget(),
+                );
+              }),
+            )
           ],
         ),
       ),

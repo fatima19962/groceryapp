@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:groceryapp/services/utils.dart';
+import 'package:groceryapp/widgets/empty_products_widget.dart';
 import 'package:groceryapp/widgets/on_sale_widget.dart';
 import 'package:groceryapp/widgets/text_widget.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
+import '../models/products_model.dart';
+import '../provider/products_provider.dart';
 import '../widgets/back_widget.dart';
 
 class OnSaleScreen extends StatelessWidget {
@@ -15,6 +19,8 @@ class OnSaleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isEmpty = true;
     final Color color = Utils(context).color;
+    final productsProvider = Provider.of<ProductsProvider>(context);
+    List<ProductModel> productsOnSale = productsProvider.getOnSaleProducts;
     return Scaffold(
       appBar: AppBar(
         leading: const BackWidget(),
@@ -37,27 +43,30 @@ class OnSaleScreen extends StatelessWidget {
           isTitle: true,
         ),
       ),
-      body: isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Image.asset("assets/images/box.png"),
-                    ),
-                    Text(
-                      "No products on sale yet!,\nStay tuned",
-                      style: TextStyle(
-                          color: color,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ),
+      body: productsOnSale.isEmpty
+          ? const EmptyProdWidget(
+              text: "No products on sale yet!,\nStay tuned",
             )
+          // ? Center(
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(8.0),
+          //       child: Column(
+          //         children: [
+          //           Padding(
+          //             padding: const EdgeInsets.all(18.0),
+          //             child: Image.asset("assets/images/box.png"),
+          //           ),
+          //           Text(
+          //             "No products on sale yet!,\nStay tuned",
+          //             style: TextStyle(
+          //                 color: color,
+          //                 fontSize: 30,
+          //                 fontWeight: FontWeight.w700),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   )
           : GridView.count(
               crossAxisSpacing: 10,
               // shrinkWrap: true,
@@ -65,8 +74,9 @@ class OnSaleScreen extends StatelessWidget {
               // physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
               childAspectRatio: 1,
-              children: List.generate(16, (index) {
-                return OnSaleWidget();
+              children: List.generate(productsOnSale.length, (index) {
+                return ChangeNotifierProvider.value(
+                    value: productsOnSale[index], child: const OnSaleWidget());
               }),
             ),
     );
